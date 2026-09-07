@@ -1,0 +1,89 @@
+# ══════════════════════════════════════════════════════════════════════════
+# COUNTRIES — each gets its own dashboard page (see pages/ folder)
+# ══════════════════════════════════════════════════════════════════════════
+# Feeds marked "VERIFY" below are best-effort guesses — I couldn't fetch
+# arbitrary websites from my build environment to confirm every URL live.
+# If a source shows 0 articles after running the collector, search
+# "<site name> RSS feed" and swap in the correct URL, or tell me and I'll
+# look it up properly.
+countries:
+  indonesia:
+    label: "Indonesia"
+    flag: "🇮🇩"
+    feeds:
+      - name: "Antara News"
+        url: "https://en.antaranews.com/rss/latest-news.xml"   # confirmed working
+    scrape_targets:
+      - name: "Jakarta Globe"
+        listing_url: "https://jakartaglobe.id/"
+        domain: "jakartaglobe.id"
+      - name: "Tempo English"
+        listing_url: "https://en.tempo.co/"
+        domain: "en.tempo.co"
+
+  malaysia:
+    label: "Malaysia"
+    flag: "🇲🇾"
+    feeds:
+      - name: "Malay Mail"
+        url: "https://www.malaymail.com/feed/rss/malaysia"      # confirmed
+      - name: "Malaysiakini"
+        url: "https://www.malaysiakini.com/rss/en/news.xml"     # VERIFY
+      - name: "Bernama"
+        url: "https://www.bernama.com/en/rss.php"                # VERIFY
+    scrape_targets: []
+
+  china:
+    label: "China"
+    flag: "🇨🇳"
+    # Note: all three are state-affiliated/state-controlled English outlets —
+    # there's no independent domestic English news source. Useful for
+    # tracking official framing/narrative, not independent reporting.
+    feeds:
+      - name: "ECNS (China News Service)"
+        url: "https://www.ecns.cn/rss/rss.xml"                   # confirmed
+      - name: "Xinhua"
+        url: "http://www.xinhuanet.com/english/rss/worldrss.xml" # VERIFY
+      - name: "Global Times"
+        url: "https://www.globaltimes.cn/rss/index.xml"          # VERIFY
+    scrape_targets: []
+
+  usa:
+    label: "United States"
+    flag: "🇺🇸"
+    feeds:
+      - name: "Breaking Defense"
+        url: "https://breakingdefense.com/full-rss-feed/"        # confirmed working
+      - name: "Defense News"
+        url: "https://www.defensenews.com/arc/outboundfeeds/rss/" # VERIFY
+    scrape_targets: []
+
+  japan:
+    label: "Japan"
+    flag: "🇯🇵"
+    feeds:
+      - name: "NHK World"
+        url: "https://www3.nhk.or.jp/nhkworld/en/news/feeds/rss.xml"  # VERIFY
+      - name: "Japan Times"
+        url: "https://www.japantimes.co.jp/feed/"                # VERIFY
+    scrape_targets: []
+
+  korea:
+    label: "Korea"
+    flag: "🇰🇷"
+    feeds:
+      - name: "Yonhap News Agency"
+        url: "https://en.yna.co.kr/RSS/news.xml"                 # confirmed
+      - name: "Korea Herald"
+        url: "https://www.koreaherald.com/rss/020000000000.xml"  # VERIFY
+    scrape_targets: []
+
+# ══════════════════════════════════════════════════════════════════════════
+# PMESII CLASSIFICATION
+# ══════════════════════════════════════════════════════════════════════════
+pmesii_model: "claude-haiku-4-5-20251001"  # cheap, fast
+
+# ══════════════════════════════════════════════════════════════════════════
+# STORAGE
+# ══════════════════════════════════════════════════════════════════════════
+database_path: "data/tracker.db"
