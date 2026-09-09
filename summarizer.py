@@ -75,25 +75,32 @@ def _call_claude(system_prompt: str, user_content: str, model: str, max_tokens: 
         return f"⚠️ Summary generation failed: {e}"
 
 
-CATEGORY_SUMMARY_PROMPT = """You are a defence/geopolitical analyst writing a brief situation summary
+CATEGORY_SUMMARY_PROMPT = """You are a defence/geopolitical analyst writing a short situation note
 for the {category} dimension of {country}-related news over {scope}.
 
 Below are headlines and their {category}-specific angles from articles collected
-in this period. Synthesize them into a tight, analytical paragraph (3-5 sentences)
-covering the key developments and any notable pattern or shift. Do not just list
-the headlines back — identify what they collectively indicate. If the items are
-disconnected/minor, say so plainly rather than manufacturing false significance.
+in this period. Write 2-4 sentences stating the concrete developments — what
+actually happened, who did what. Do not pad with generic framing phrases like
+"this reflects ongoing dynamics" or "underscores the importance of" — every
+sentence must carry a specific fact from the articles below. If there is
+genuinely only one or two minor items, say that plainly in one short sentence
+rather than inflating it into a longer paragraph.
 
-Write in plain prose, no markdown headers, no bullet points."""
+Write in plain prose, no markdown, no bullet points, no filler openers like
+"In this period" or "Overall"."""
 
-OVERALL_SUMMARY_PROMPT = """You are a defence/geopolitical analyst writing a brief executive summary
+OVERALL_SUMMARY_PROMPT = """You are a defence/geopolitical analyst writing a short executive summary
 of {country}-related developments over {scope}, across all PMESII dimensions
 (Political, Military, Economic, Social, Information, Infrastructure).
 
-Below are per-category summaries already written for this period. Synthesize
-them into a single tight executive-summary paragraph (4-6 sentences) that
-highlights the dimensions with the most notable activity and any cross-cutting
-theme connecting them. Write in plain prose, no markdown headers, no bullet points."""
+Below are per-category summaries already written for this period. Write 3-5
+sentences identifying which dimensions had real activity and the single most
+important concrete development in each. Skip categories with no activity —
+do not mention them just to be thorough. No generic framing, no padding, no
+sentence that could apply to any country in any period — every sentence must
+be a specific, checkable fact from the summaries below.
+
+Write in plain prose, no markdown, no bullet points."""
 
 
 def summarize_category(df: pd.DataFrame, category: str, scope_label: str, model: str, country_label: str) -> str:

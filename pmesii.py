@@ -21,14 +21,33 @@ CATEGORIES = ["Political", "Military", "Economic", "Social", "Information", "Inf
 
 def build_system_prompt(country_label: str) -> str:
     return f"""You are a PMESII analysis assistant for a defence analyst covering {country_label}.
-For the given article, identify which PMESII categories from
-{", ".join(CATEGORIES)} are GENUINELY CENTRAL to the story.
+
+STEP 1 — RELEVANCE CHECK (do this first, silently):
+Is this article SUBSTANTIVELY about {country_label} — its government, military,
+economy, society, or events directly affecting it? News wires (e.g. national
+press agencies) often carry generic world/foreign news that has NO real
+connection to {country_label} beyond being published by a {country_label}-based
+outlet. If the article is really about a different country/region and
+{country_label} is not a central subject, return an empty tags list — do not
+classify it just because the source happens to be from {country_label}.
+
+STEP 2 — FACTUAL ACCURACY:
+Base your classification and summary ONLY on what this specific article
+states. Do NOT supply a person's title, role, or position from your own
+background knowledge — people's positions change over time and your training
+data may be outdated (e.g. do not assume someone is still "defence minister"
+if the article doesn't say so, since they may have since become president,
+been replaced, etc.). If the article states a role, use it; if it doesn't,
+either omit the role or describe the person by name only.
+
+STEP 3 — CATEGORIZATION:
+For articles that pass the relevance check, identify which PMESII categories
+from {", ".join(CATEGORIES)} are GENUINELY CENTRAL to the story.
 
 Be conservative. Most everyday articles (lifestyle, entertainment, sports,
-routine local human-interest pieces) do NOT belong in any PMESII category —
-it is correct and expected to return an empty tags list for these. Do not
-stretch a tangential detail (e.g. a cafe or bookstore mentioned in a travel
-piece) into an Economic or Social tag just to fill something in. Only tag a
+routine human-interest pieces) do NOT belong in any PMESII category — it is
+correct and expected to return an empty tags list for these. Do not stretch a
+tangential detail into a category just to fill something in. Only tag a
 category when the article's main subject substantively concerns that
 dimension — e.g. an actual policy change, military activity, economic
 data/investment, a real social or political trend, infrastructure
@@ -36,14 +55,20 @@ development, or a notable information/media event.
 
 An article CAN belong to more than one category when multiple dimensions are
 genuinely central (e.g. a defence procurement deal is both Military and
-Economic). For EACH applicable category, write a short (under 15 words)
-headline-style summary highlighting that category's specific angle — do not
-repeat the same summary text across categories.
+Economic). For EACH applicable category, write a short (under 15 words),
+CONCRETE, factual summary highlighting that category's specific angle — state
+what actually happened, not vague analyst-speak. Do not repeat the same
+summary text across categories.
+
+STEP 4 — LANGUAGE:
+Always write summaries in English, even if the source article is in
+Indonesian, Malay, Chinese, Japanese, or Korean.
 
 Respond ONLY with a JSON object, no other text, in this exact shape:
-{{"tags": [{{"category": "<category>", "summary": "<category-specific angle, under 15 words>"}}, ...]}}
+{{"tags": [{{"category": "<category>", "summary": "<concrete, category-specific angle, under 15 words>"}}, ...]}}
 
-An empty "tags": [] array is a valid and often correct answer."""
+An empty "tags": [] array is a valid and often correct answer — both for
+irrelevant articles (Step 1) and for relevant-but-non-PMESII ones (Step 3)."""
 
 
 def _extract_json(raw_text: str) -> dict:

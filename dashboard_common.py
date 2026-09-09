@@ -12,6 +12,7 @@ from pathlib import Path
 
 from analysis import load_pmesii_tags, CATEGORIES
 from summarizer import PERIOD_OPTIONS, filter_by_period, summarize_category, summarize_overall
+from capdev_analysis import generate_capdev_outlook
 
 CONFIG_PATH = Path(__file__).parent / "config.yaml"
 
@@ -97,6 +98,36 @@ def render_country_dashboard(country_key: str, country_label: str, flag: str):
                 st.write(s["cat_summaries"].get(cat, ""))
     else:
         st.caption("Pick a time window and click Generate to get an AI-written synthesis.")
+
+    st.divider()
+
+    # ── Capability Development Outlook (on-demand, AI-generated) ────────
+    st.subheader("🎯 Capability Development Outlook")
+    st.caption(
+        "Pattern analysis of Military/Economic/Infrastructure signals — what's "
+        "concretely been reported, and what that pattern may suggest as a current "
+        "priority area. This is inference from public reporting, not a forecast "
+        "or confirmation of any specific future decision — treat it as a starting "
+        "point for your own analysis, not a conclusion."
+    )
+    cd1, _ = st.columns([1, 3])
+    cd_period = cd1.selectbox("Time window", options=list(PERIOD_OPTIONS.keys()), key=f"{country_key}_cd_period")
+    cd_generate = cd1.button("Generate outlook", type="primary", key=f"{country_key}_cd_generate")
+
+    cd_session_key = f"{country_key}_capdev"
+
+    if cd_generate:
+        cd_period_df = filter_by_period(tags_df, cd_period)
+        with st.spinner("Analyzing capability development signals..."):
+            outlook = generate_capdev_outlook(cd_period_df, country_label, cd_period.lower(), summary_model)
+        st.session_state[cd_session_key] = {"outlook": outlook, "period": cd_period}
+
+    if cd_session_key in st.session_state:
+        cd = st.session_state[cd_session_key]
+        st.markdown(f"**Outlook — {cd['period']}**")
+        st.write(cd["outlook"])
+    else:
+        st.caption("Pick a time window and click Generate.")
 
     st.divider()
 
